@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<link type="text/css" rel="stylesheet" href="css/common.css" />
+		<title>空间练习</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+
+		<script src="lib/jquery-2.1.1.min.js"></script>
+		<script src="lib/three.min.js"></script>
+		<!--<script src="js/OrbitControls.js"></script>-->
+		<script src="js/OrbitControls-Touch.js"></script>
+		<script src="js/DeviceOrientationControls.js"></script>
+		<script src="js/Controls.js"></script>
+		<script src="lib/TweenMax.min.js"></script>
+		<script src="lib/chroma.js"></script>
+		<script src="lib/vconsole.min.js"></script>
+		
+
+		<script>
+			(function(doc, win) {
+				var docEl = doc.documentElement,
+					resizeEvt = 'onorientationchange' in window ? 'onorientationchange' : 'resize',
+					recalc = function() {
+						var clientWidth = docEl.clientWidth;
+						if(!clientWidth) return;
+						if(clientWidth >= 640) {
+							docEl.style.fontSize = '100px';
+						} else {
+							docEl.style.fontSize = 100 * (clientWidth / 640) + 'px';
+						}
+					};
+
+				if(!doc.addEventListener) return;
+				win.addEventListener(resizeEvt, recalc, false);
+				doc.addEventListener('DOMContentLoaded', recalc, false);
+			})(document, window);
+		</script>
+
+		<style>
+			#back {
+				position: absolute;
+				width: 2rem;
+				height: .8rem;
+				color: #ffffff;
+				font-size: .5rem;
+				bottom: .5rem;
+				left: 1rem;
+				opacity: 0;
+			}
+			
+			.back_in {
+				animation: a_back_in 0.5s ease-out forwards;
+			}
+			
+			@keyframes a_back_in {
+				0% {
+					opacity: 0;
+					left: 1rem;
+				}
+				100% {
+					opacity: 1;
+					left: 0;
+				}
+			}
+			
+			.back_out {
+				animation: a_back_out 0.5s ease-out forwards;
+			}
+			
+			@keyframes a_back_out {
+				0% {
+					opacity: 1;
+					left: 0;
+				}
+				100% {
+					opacity: 0;
+					left: 1rem;
+				}
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<div id="wrapper">
+			<div id="canvas-frame"></div>
+		</div>
+
+		<div id="back">
+			back >
+		</div>
+
+		<script src="js/Clouds.js"></script>
+		<script src="js/Ball.js"></script>
+		<script src="js/Particles.js"></script>
+		<script src="js/Main.js"></script>
+
+	</body>
+
+</html>

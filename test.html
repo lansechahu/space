@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<link type="text/css" rel="stylesheet" href="css/common.css" />
+		<title>缓动拖动</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+
+		<script src="lib/jquery-2.1.1.min.js"></script>
+
+		<script>
+			(function(doc, win) {
+				var docEl = doc.documentElement,
+					resizeEvt = 'onorientationchange' in window ? 'onorientationchange' : 'resize',
+					recalc = function() {
+						var clientWidth = docEl.clientWidth;
+						if(!clientWidth) return;
+						if(clientWidth >= 640) {
+							docEl.style.fontSize = '100px';
+						} else {
+							docEl.style.fontSize = 100 * (clientWidth / 640) + 'px';
+						}
+					};
+
+				if(!doc.addEventListener) return;
+				win.addEventListener(resizeEvt, recalc, false);
+				doc.addEventListener('DOMContentLoaded', recalc, false);
+			})(document, window);
+		</script>
+
+		<style>
+			#box {
+				position: absolute;
+				width: 1rem;
+				height: 1rem;
+				background: #ff0000;
+				top: 0;
+				left: 0;
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<div id="box"></div>
+
+		<script>
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var mouseX = 0;
+			var mouseY = 0;
+			var mouseXOnMouseDown = 0;
+			var mouseYOnMouseDown = 0;
+			var targetX = 0;
+			var targetY = 0;
+			var targetXOnMouseDown = 0;
+			var targetYOnMouseDown = 0;
+
+			document.addEventListener('touchstart', onMouseDown, false);
+
+			function onMouseDown(event) {
+				mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
+				targetXOnMouseDown = targetX;
+
+				mouseYOnMouseDown = event.touches[0].pageY - windowHalfY;
+				targetYOnMouseDown = targetY;
+
+				document.addEventListener('touchmove', onMouseMove, false);
+				document.addEventListener('touchend', onMouseUp, false);
+			}
+
+			function onMouseMove(event) {
+				mouseX = event.touches[0].pageX - windowHalfX;
+				targetX = targetXOnMouseDown + (mouseX - mouseXOnMouseDown) * 1;
+
+				mouseY = event.touches[0].pageY - windowHalfY;
+				targetY = targetYOnMouseDown + (mouseY - mouseYOnMouseDown) * 1;
+			}
+
+			function onMouseUp(event) {
+				document.removeEventListener('touchmove', onMouseMove, false);
+				document.removeEventListener('touchend', onMouseUp, false);
+			}
+
+			render();
+
+			function render() {
+				update();
+				requestAnimationFrame(render);
+			}
+
+			function update() {
+				var __x = $('#box').position().left + (targetX - $('#box').position().left) * 0.05;
+				var __y = $('#box').position().top + (targetY - $('#box').position().top) * 0.05;
+				$('#box').css({
+					'left': __x + 'px',
+					'top': __y + 'px'
+				});
+			}
+		</script>
+	</body>
+
+</html>

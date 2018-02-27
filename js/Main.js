@@ -121,7 +121,8 @@ $(function() {
 	initControl(); //初始化控制器
 	initLight(); //初始化灯光
 	create_sky(); //创建天空
-	create_man(); //加载外部模型
+	create_model(); //创建模型
+	//create_man(); //加载外部模型
 	join_clouds(); //创建所有的云
 	create_ball(); //创建点击提示球
 	create_particle(); //创建粒子
@@ -154,11 +155,11 @@ function initScene() {
 function initCamera() {
 
 	//创建摄像机香肠
-	var sphere = new THREE.CubeGeometry(5, 5, 5);
+	var sphere = new THREE.CubeGeometry(1, 1, 1);
 	cameraBox = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({
 		color: 0x00ff00,
 		transparent: true,
-		opacity: 0
+		opacity: 0.1
 	}));
 
 	//设置摄像机香肠的位置，为第一个模型的位置
@@ -189,14 +190,15 @@ function initControl() {
 
 function initLight() {
 	//环境光
-	light = new THREE.AmbientLight(0xffffff, 0.5);
-	scene.add(light);
+	/*light = new THREE.AmbientLight(0xffaa00, 0.5);
+	scene.add(light);*/
 
 	//方向光
 	var dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
 	dirLight.position.set(10, 30, 20);
-	//dirLight.castShadow = true;
 	scene.add(dirLight);
+
+	scene.add(new THREE.HemisphereLight(0x443333, 0x111122));
 
 	/*var helper = new THREE.DirectionalLightHelper(dirLight);
 	scene.add(helper);*/
@@ -246,6 +248,52 @@ function loadTexture(path) {
 		side: THREE.BackSide
 	})
 	return material;
+}
+
+//创建模型
+function create_model() {
+	var __num = 0;
+
+	var model = new Model1();
+	model.init(model_complete);
+	scene.add(model);
+	model.position.set(modelArr[0].x, modelArr[0].y, modelArr[0].z);
+	model.rotation.y = modelArr[0].rotationY * Math.PI / 180;
+	meshArr.push(model);
+
+	var model2 = new Model2();
+	model2.init(model_complete);
+	scene.add(model2);
+	model2.position.set(modelArr[1].x, modelArr[1].y, modelArr[1].z);
+	model2.rotation.y = modelArr[1].rotationY * Math.PI / 180;
+	meshArr.push(model2);
+
+	var model3 = new Model3();
+	model3.init(model_complete);
+	scene.add(model3);
+	model3.position.set(modelArr[2].x, modelArr[2].y, modelArr[2].z);
+	model3.rotation.y = modelArr[2].rotationY * Math.PI / 180;
+	meshArr.push(model3);
+
+	var model4 = new Model4();
+	model4.init(model_complete);
+	scene.add(model4);
+	model4.position.set(modelArr[3].x, modelArr[3].y, modelArr[3].z);
+	model4.rotation.y = modelArr[3].rotationY * Math.PI / 180;
+	meshArr.push(model4);
+
+	function model_complete() {
+		__num++;
+		if(__num >= modelArr.length) {
+			//模型都载入完毕后，可以开始移动摄像机了
+			setTimeout(function() {
+				isBegin = true;
+				isMove = false;
+				$('#wrapper').show();
+				$('#wrapper').addClass('wrapper_show');
+			}, 500);
+		}
+	}
 }
 
 //创建模型
@@ -351,7 +399,7 @@ var startX, startY;
 var currX, currY;
 var mouse = new THREE.Vector3();
 var raycaster = new THREE.Raycaster();
-var isMove = false; //摄像头是否正在移动，如果为true，则场景拖动无效
+var isMove = true; //摄像头是否正在移动，如果为true，则场景拖动无效
 
 function initAction() {
 	$('body').on('touchstart', startHandler);
@@ -408,13 +456,14 @@ function endHandler() {
 	var intersects = raycaster.intersectObjects(scene.children, true);
 	if(intersects.length > 0) {
 		var currObj = intersects[0].object;
-		
+
 		//如果鼠标移动的距离大于50，则摄像机移到下一个模型上,否则如果点击到的对象类型是main，则说明点击到模型了
 		if(Math.abs(currX - startX) > 50 || Math.abs(currY - startY) > 50) {
 			canActive = false;
 			boxMove();
 		} else {
-			if(currObj.myType == 'main') {
+			console.log(currObj.parent.myType);
+			if(currObj.parent.myType == 'model') {
 				//点击到模型了
 				canActive = false;
 				isMove = true; //设置正在移动，让场景拖动无效
@@ -497,6 +546,8 @@ function cameraRest() {
 }
 
 function render() {
+	delta = clock.getDelta();
+
 	if(controls) {
 		//控制器update
 		controls.update(delta);
@@ -523,8 +574,14 @@ function render() {
 		if(particle) {
 			particle.update();
 		}
+
+		//模型update
+		for(var i = 0; i < meshArr.length; i++) {
+			var temp = meshArr[i];
+			temp.update(delta);
+		}
 	}
-	
+
 	//天空盒子也可以动哟
 	/*if(skyBox){
 		skyBox.rotation.y+=0.1*Math.PI/180;

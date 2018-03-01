@@ -159,7 +159,7 @@ function initCamera() {
 	cameraBox = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({
 		color: 0x00ff00,
 		transparent: true,
-		opacity: 0.1
+		opacity: 0
 	}));
 
 	//设置摄像机香肠的位置，为第一个模型的位置
@@ -190,13 +190,13 @@ function initControl() {
 
 function initLight() {
 	//环境光
-	/*light = new THREE.AmbientLight(0xffaa00, 0.5);
+	/*light = new THREE.AmbientLight(0xffffff, 0);
 	scene.add(light);*/
 
 	//方向光
-	var dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+	/*var dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
 	dirLight.position.set(10, 30, 20);
-	scene.add(dirLight);
+	scene.add(dirLight);*/
 
 	scene.add(new THREE.HemisphereLight(0x443333, 0x111122));
 
@@ -208,7 +208,7 @@ function initLight() {
 var skyBox; //天空盒
 function create_sky() {
 	//方法一
-	var materials = [
+	/*var materials = [
 		loadTexture('model/px.jpg'), // right
 		loadTexture('model/nx.jpg'), // left
 		loadTexture('model/py.jpg'), // top
@@ -219,7 +219,7 @@ function create_sky() {
 	var skyMaterial = new THREE.MeshFaceMaterial(materials);
 	var skyGeometry = new THREE.CubeGeometry(500, 500, 500);
 	skyBox = new THREE.Mesh(skyGeometry, skyMaterial);
-	scene.add(skyBox);
+	scene.add(skyBox);*/
 
 	//方法二
 	/*var textureCube = new THREE.CubeTextureLoader()
@@ -229,15 +229,15 @@ function create_sky() {
 		});*/
 
 	//方法三
-	/*var skyboxGeometry = new THREE.SphereGeometry(300, 20, 20);
-	var map = new THREE.TextureLoader().load("model/sky2.jpg");
+	var skyboxGeometry = new THREE.SphereGeometry(100, 20, 20);
+	var map = new THREE.TextureLoader().load("model/background.jpg");
 	map.wrapT = THREE.RepeatWrapping;
 	var skyboxMaterial = new THREE.MeshBasicMaterial({
 		map: map,
 		side: THREE.BackSide
 	});
-	var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
-	scene.add(skybox);*/
+	skyBox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+	scene.add(skyBox);
 
 }
 
@@ -352,7 +352,7 @@ function create_ball() {
 		var ball = new Ball();
 		ball.init();
 		scene.add(ball);
-		ball.position.set(modelArr[i].x - 4, modelArr[i].y + 2, modelArr[i].z + 3);
+		ball.position.set(modelArr[i].x - 4, modelArr[i].y + 2, modelArr[i].z + 10);
 		ballArr.push(ball);
 	}
 }
@@ -583,9 +583,9 @@ function render() {
 	}
 
 	//天空盒子也可以动哟
-	/*if(skyBox){
+	if(skyBox){
 		skyBox.rotation.y+=0.1*Math.PI/180;
-	}*/
+	}
 
 	requestAnimationFrame(render);
 	renderer.render(scene, camera);

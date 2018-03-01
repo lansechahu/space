@@ -1,27 +1,27 @@
-function Model2() {
+function Model1() {
 	THREE.Object3D.call(this);
 
 	this.myType = 'model';
-	this.myId = 1;
+	this.myId = 0;
 
 	var scope = this;
-	var mesh;
-	var angleY = 0;
 
 	this.init = function(__complete) {
-		var loader = new THREE.TextureLoader();
-		var texture = loader.load('model/land/b/textures/sketchfabSurface_Color.jpg');
+		var loader = new THREE.PLYLoader();
+		loader.load('model/dolphins.ply', function(geometry) {
 
-		var jsloader = new THREE.JSONLoader();
-		jsloader.load("model/land/b/bLand.js", function(geometry, materials) {
-			var a = new THREE.MeshBasicMaterial({
-				map: texture
+			//geometry.computeVertexNormals();
+
+			var material = new THREE.MeshStandardMaterial({
+				color: 0x0055ff,
+				flatShading: true
 			});
+			var mesh = new THREE.Mesh(geometry, material);
 
-			mesh = new THREE.Mesh(geometry, a);
+			mesh.rotation.x = -Math.PI / 2;
+			mesh.scale.multiplyScalar(0.015);
+
 			scope.add(mesh);
-			mesh.position.set(2, -5, 8);
-			mesh.scale.multiplyScalar(0.05);
 
 			//创建该模型上的云
 			var cloud1 = new Clouds();
@@ -49,12 +49,9 @@ function Model2() {
 	}
 
 	this.update = function() {
-		if(mesh) {
-			angleY += 1 * Math.PI / 180;
-			mesh.position.y = Math.sin(angleY) * .5 + 0.5 - 5;
-		}
+
 	}
 }
 
-Model2.constructor = Model2;
-Model2.prototype = Object.create(THREE.Object3D.prototype);
+Model1.constructor = Model1;
+Model1.prototype = Object.create(THREE.Object3D.prototype);

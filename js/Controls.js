@@ -29,7 +29,7 @@ var Controls = function(__camera, __target) {
 
 	this.setTarget = function(__target) {
 		scope.target = __target;
-		radius = 20; //Math.abs(camera.position.z - scope.target.z);
+		radius = 15; //Math.abs(camera.position.z - scope.target.z);
 		targetX = 45;
 	}
 

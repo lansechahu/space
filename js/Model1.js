@@ -5,23 +5,25 @@ function Model1() {
 	this.myId = 0;
 
 	var scope = this;
+	var mixer;
+	var mesh;
+	var angle = 0;
+	var angleY = 0;
 
 	this.init = function(__complete) {
-		var loader = new THREE.PLYLoader();
-		loader.load('model/dolphins.ply', function(geometry) {
+		var loader = new THREE.TextureLoader();
+		var texture = loader.load('model/land/a/textures/textureSurface_Color_2.jpg');
+		var texture_ao = loader.load('model/land/a/textures/textureAmbient_Occlusion.jpg');
 
-			//geometry.computeVertexNormals();
-
-			var material = new THREE.MeshStandardMaterial({
-				color: 0x0055ff,
-				flatShading: true
+		var jsloader = new THREE.JSONLoader();
+		jsloader.load("model/land/a/aland.js", function(geometry, materials) {
+			var a = new THREE.MeshPhongMaterial({
+				map: texture
 			});
-			var mesh = new THREE.Mesh(geometry, material);
 
-			mesh.rotation.x = -Math.PI / 2;
-			mesh.scale.multiplyScalar(0.015);
-
+			mesh = new THREE.Mesh(geometry, a);
 			scope.add(mesh);
+			mesh.scale.multiplyScalar(0.05);
 
 			//创建该模型上的云
 			var cloud1 = new Clouds();
@@ -40,6 +42,32 @@ function Model1() {
 			cloud2.position.y = modelArr[scope.myId].cloud2.y;
 			cloud2.position.z = modelArr[scope.myId].cloud2.z;
 
+			//创建小动物
+			var loader2 = new THREE.TextureLoader();
+			var texture2 = loader2.load('model/land/a1/textures/texture.png');
+
+			var jsloader = new THREE.JSONLoader();
+			jsloader.load("model/land/a1/animations.js", function(geometry, materials) {
+				var b = new THREE.MeshPhongMaterial({
+					map: texture2,
+					flatShading: true,
+					morphTargets: true, //是否变形目标
+					morphNormals: true, //是否用了法线变形
+					specular: 0,
+					shininess: 0,
+					skinning: true //是否使用蒙皮
+				});
+
+				var animate = new THREE.SkinnedMesh(geometry, b);
+				mesh.add(animate);
+				animate.scale.multiplyScalar(0.1);
+				animate.position.z = 30;
+				animate.position.y = 5;
+
+				mixer = new THREE.AnimationMixer(animate);
+				mixer.clipAction(geometry.animations[0]).play();
+			});
+
 			if(__complete) __complete();
 		});
 	}
@@ -48,8 +76,18 @@ function Model1() {
 
 	}
 
-	this.update = function() {
+	this.update = function(delta) {
+		if(mixer) {
+			mixer.update(delta);
+		}
 
+		if(mesh) {
+			angle += 0.05 * Math.PI / 180;
+			mesh.rotation.y = angle;
+
+			angleY += 1 * Math.PI / 180;
+			mesh.position.y = Math.sin(angleY) * .5 + 0.5;
+		}
 	}
 }
 

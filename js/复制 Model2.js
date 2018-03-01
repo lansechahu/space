@@ -5,23 +5,23 @@ function Model2() {
 	this.myId = 1;
 
 	var scope = this;
-	var mesh;
-	var angleY = 0;
 
 	this.init = function(__complete) {
-		var loader = new THREE.TextureLoader();
-		var texture = loader.load('model/land/b/textures/sketchfabSurface_Color.jpg');
+		var loader = new THREE.PLYLoader();
+		loader.load('model/Lucy100k.ply', function(geometry) {
 
-		var jsloader = new THREE.JSONLoader();
-		jsloader.load("model/land/b/bLand.js", function(geometry, materials) {
-			var a = new THREE.MeshBasicMaterial({
-				map: texture
+			geometry.computeVertexNormals();
+
+			var material = new THREE.MeshStandardMaterial({
+				color: 0xff55ff,
+				flatShading: true
 			});
+			var mesh = new THREE.Mesh(geometry, material);
 
-			mesh = new THREE.Mesh(geometry, a);
+			mesh.rotation.y = Math.PI / 2 + 90;
+			mesh.scale.multiplyScalar(0.01);
+
 			scope.add(mesh);
-			mesh.position.set(2, -5, 8);
-			mesh.scale.multiplyScalar(0.05);
 
 			//创建该模型上的云
 			var cloud1 = new Clouds();
@@ -39,7 +39,7 @@ function Model2() {
 			cloud2.position.x = modelArr[scope.myId].cloud2.x;
 			cloud2.position.y = modelArr[scope.myId].cloud2.y;
 			cloud2.position.z = modelArr[scope.myId].cloud2.z;
-
+			
 			if(__complete) __complete();
 		});
 	}
@@ -49,10 +49,7 @@ function Model2() {
 	}
 
 	this.update = function() {
-		if(mesh) {
-			angleY += 1 * Math.PI / 180;
-			mesh.position.y = Math.sin(angleY) * .5 + 0.5 - 5;
-		}
+
 	}
 }
 

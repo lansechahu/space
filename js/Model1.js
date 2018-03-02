@@ -26,7 +26,7 @@ function Model1() {
 			mesh.scale.multiplyScalar(0.05);
 
 			//创建该模型上的云
-			var cloud1 = new Clouds();
+			/*var cloud1 = new Clouds();
 			cloud1.init();
 			scope.add(cloud1);
 			cloud1.scale.set(modelArr[scope.myId].cloud1.scale, modelArr[scope.myId].cloud1.scale, modelArr[scope.myId].cloud1.scale);
@@ -40,9 +40,9 @@ function Model1() {
 			cloud2.scale.set(modelArr[scope.myId].cloud2.scale, modelArr[scope.myId].cloud2.scale, modelArr[scope.myId].cloud2.scale);
 			cloud2.position.x = modelArr[scope.myId].cloud2.x;
 			cloud2.position.y = modelArr[scope.myId].cloud2.y;
-			cloud2.position.z = modelArr[scope.myId].cloud2.z;
+			cloud2.position.z = modelArr[scope.myId].cloud2.z;*/
 
-			//创建小动物
+			//创建小动物，蒙皮动画
 			var loader2 = new THREE.TextureLoader();
 			var texture2 = loader2.load('model/land/a1/textures/texture.png');
 

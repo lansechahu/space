@@ -12,6 +12,7 @@ var camera_dis = 40; //摄像机距目标的z轴距离
 var canActive = true; //大场景拖动判定，为false时是不能拖动
 var meshArr = []; //模型数组
 var ballArr = []; //提示点数组
+var cloudArr = []; //云数组
 var isBegin = false; //模型是否已经载入
 
 var cloudBox; //大片云的容器
@@ -20,6 +21,8 @@ var cloudNum = 20; //大片云的数量
 var panY = 10; //Y轴的偏移量，让镜头不是正对着对象
 
 var particle; //粒子
+
+var composer; //shader渲染器
 
 //模型信息数组
 var modelArr = [{
@@ -119,7 +122,7 @@ $(function() {
 	initScene(); //初始化场景
 	initCamera(); //初始化摄像机
 	initControl(); //初始化控制器
-	initLight(); //初始化灯光
+	//initLight(); //初始化灯光
 	create_sky(); //创建天空
 	create_model(); //创建模型
 	//create_man(); //加载外部模型
@@ -128,7 +131,9 @@ $(function() {
 	create_particle(); //创建粒子
 
 	initAction();
-	render();
+
+	initShader(); //初始化shader
+	//render();
 });
 
 function getSize() {
@@ -367,11 +372,12 @@ function join_clouds() {
 		temp.init();
 		scene.add(temp);
 		var scale = Math.random() * 2 + 1;
-		var __x = 50 - Math.random() * 200;
-		var __y = 50 - Math.random() * 200;
-		var __z = 50 - Math.random() * 200;
+		var __x = Math.random() * 100 - 50;
+		var __y = 50 - Math.random() * 100;
+		var __z = 50 - Math.random() * 100;
 		temp.scale.set(scale, scale, scale);
 		temp.position.set(__x, __y, __z);
+		cloudArr.push(temp);
 	}
 }
 
@@ -545,6 +551,30 @@ function cameraRest() {
 	controls.enabled = false;
 }
 
+//初始化shader
+function initShader() {
+	var hTilt = new THREE.ShaderPass(THREE.HorizontalTiltShiftShader);
+	hTilt.enabled = true;
+	hTilt.uniforms.h.value = 2 / window.innerHeight;
+	hTilt.uniforms.r.value = 0.5;
+	var vTilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
+	vTilt.enabled = true;
+	vTilt.uniforms.v.value = 2 / window.innerWidth;
+	vTilt.uniforms.r.value = 0.5;
+
+	var renderPass = new THREE.RenderPass(scene, camera);
+	var effectCopy = new THREE.ShaderPass(THREE.CopyShader);
+	effectCopy.renderToScreen = true;
+
+	composer = new THREE.EffectComposer(renderer);
+	composer.addPass(renderPass);
+	composer.addPass(vTilt);
+	composer.addPass(hTilt);
+	composer.addPass(effectCopy);
+
+	render();
+}
+
 function render() {
 	delta = clock.getDelta();
 
@@ -583,22 +613,24 @@ function render() {
 	}
 
 	//天空盒子也可以动哟
-	if(skyBox){
-		skyBox.rotation.y+=0.1*Math.PI/180;
+	if(skyBox) {
+		skyBox.rotation.y += 0.1 * Math.PI / 180;
 	}
 
 	requestAnimationFrame(render);
-	renderer.render(scene, camera);
+	if(composer) {
+		composer.render();
+	} else {
+		renderer.render(scene, camera);
+	}
+
 }
 
 function cloudUpdate() {
-	for(var i = 0; i < meshArr.length; i++) {
-		var temp = meshArr[i];
-		for(var j = 0; j < temp.children.length; j++) {
-			if(temp.children[j].myType == 'cloud') {
-				var __cloud = temp.children[j];
-				__cloud.update();
-			}
+	for(var i = 0; i < cloudArr.length; i++) {
+		var temp = cloudArr[i];
+		if(temp.myType == 'cloud') {
+			temp.update();
 		}
 	}
 }

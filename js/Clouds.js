@@ -19,7 +19,7 @@ function Clouds() {
 		speedNum = speed;
 		speedSub = speed * 0.002;
 		var loader = new THREE.JSONLoader();
-		loader.load('model/cloud1.json', function(geo, materials) {
+		loader.load('model/cloud/cloud.js', function(geo, materials) {
 			cloud_geo = geo;
 			cloud_material = new THREE.MeshPhongMaterial({
 				color: 0xffffff
@@ -32,12 +32,14 @@ function Clouds() {
 	this.join = function() {
 		cloud = new THREE.Mesh(cloud_geo, cloud_material);
 		scope.add(cloud);
+		var scale = Math.random() * 3;
+		cloud.scale.multiplyScalar(scale * 0.5);
 	}
 
 	this.update = function() {
 		if(cloud) {
-			angle+=speed;
-			var aa = Math.sin(angle)*0.005;
+			angle += speed;
+			var aa = Math.sin(angle) * 0.005;
 			cloud.position.x += aa;
 		}
 	}

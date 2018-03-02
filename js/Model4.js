@@ -50,7 +50,7 @@ function Model4() {
 			mixer.clipAction(geometry.animations[0]).play();
 
 			//创建该模型上的云
-			var cloud1 = new Clouds();
+			/*var cloud1 = new Clouds();
 			cloud1.init();
 			scope.add(cloud1);
 			cloud1.scale.set(modelArr[scope.myId].cloud1.scale, modelArr[scope.myId].cloud1.scale, modelArr[scope.myId].cloud1.scale);
@@ -64,7 +64,7 @@ function Model4() {
 			cloud2.scale.set(modelArr[scope.myId].cloud2.scale, modelArr[scope.myId].cloud2.scale, modelArr[scope.myId].cloud2.scale);
 			cloud2.position.x = modelArr[scope.myId].cloud2.x;
 			cloud2.position.y = modelArr[scope.myId].cloud2.y;
-			cloud2.position.z = modelArr[scope.myId].cloud2.z;
+			cloud2.position.z = modelArr[scope.myId].cloud2.z;*/
 
 			if(__complete) __complete();
 		});

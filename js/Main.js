@@ -234,7 +234,7 @@ function create_sky() {
 		});*/
 
 	//方法三
-	var skyboxGeometry = new THREE.SphereGeometry(100, 20, 20);
+	var skyboxGeometry = new THREE.SphereGeometry(1000, 20, 20);
 	var map = new THREE.TextureLoader().load("model/background.jpg");
 	map.wrapT = THREE.RepeatWrapping;
 	var skyboxMaterial = new THREE.MeshBasicMaterial({

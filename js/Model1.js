@@ -16,7 +16,7 @@ function Model1() {
 		var texture_ao = loader.load('model/land/a/textures/textureAmbient_Occlusion.jpg');
 
 		var jsloader = new THREE.JSONLoader();
-		jsloader.load("model/land/a/aland.js", function(geometry, materials) {
+		jsloader.load("model/land/a/aland.json", function(geometry, materials) {
 			var a = new THREE.MeshPhongMaterial({
 				map: texture
 			});
@@ -47,7 +47,7 @@ function Model1() {
 			var texture2 = loader2.load('model/land/a1/textures/texture.png');
 
 			var jsloader = new THREE.JSONLoader();
-			jsloader.load("model/land/a1/animations.js", function(geometry, materials) {
+			jsloader.load("model/land/a1/animations.json", function(geometry, materials) {
 				var b = new THREE.MeshPhongMaterial({
 					map: texture2,
 					flatShading: true,

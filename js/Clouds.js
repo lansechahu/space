@@ -19,7 +19,7 @@ function Clouds() {
 		speedNum = speed;
 		speedSub = speed * 0.002;
 		var loader = new THREE.JSONLoader();
-		loader.load('model/cloud/cloud.js', function(geo, materials) {
+		loader.load('model/cloud/cloud.json', function(geo, materials) {
 			cloud_geo = geo;
 			cloud_material = new THREE.MeshPhongMaterial({
 				color: 0xffffff

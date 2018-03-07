@@ -13,7 +13,7 @@ function Model2() {
 		var texture = loader.load('model/land/b/textures/sketchfabSurface_Color.jpg');
 
 		var jsloader = new THREE.JSONLoader();
-		jsloader.load("model/land/b/bLand.js", function(geometry, materials) {
+		jsloader.load("model/land/b/bLand.json", function(geometry, materials) {
 			var a = new THREE.MeshBasicMaterial({
 				map: texture
 			});

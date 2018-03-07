@@ -23,6 +23,8 @@ var panY = 10; //Y轴的偏移量，让镜头不是正对着对象
 var particle; //粒子
 
 var composer; //shader渲染器
+var effectGlitch; //电磁干扰shader
+var effectCopy;
 
 //模型信息数组
 var modelArr = [{
@@ -106,7 +108,7 @@ var modelArr = [{
 $(function() {
 	var vconsole = new VConsole();
 
-	document.addEventListener('touchstart', function(event) {
+	document.addEventListener('touchmove', function(event) {
 		event.preventDefault();
 	});
 
@@ -121,16 +123,18 @@ $(function() {
 	initThree(); //初始化Threejs
 	initScene(); //初始化场景
 	initCamera(); //初始化摄像机
-	initControl(); //初始化控制器
-	//initLight(); //初始化灯光
-	create_sky(); //创建天空
-	create_model(); //创建模型
+	//initControl(); //初始化控制器
+	initLight(); //初始化灯光
+	//create_sky(); //创建天空
+	//create_model(); //创建模型
 	//create_man(); //加载外部模型
-	join_clouds(); //创建所有的云
-	create_ball(); //创建点击提示球
-	create_particle(); //创建粒子
+	//join_clouds(); //创建所有的云
+	//create_ball(); //创建点击提示球
+	//create_particle(); //创建粒子
 
-	initAction();
+	create_loading();
+
+	//initAction();
 
 	initShader(); //初始化shader
 	//render();
@@ -150,7 +154,7 @@ function initThree() {
 	//renderer.shadowMapEnabled = true;
 	renderer.setSize(wid, hei);
 	document.getElementById('canvas-frame').appendChild(renderer.domElement);
-	renderer.setClearColor(0xcccccc, 1.0);
+	renderer.setClearColor(0x000000, 1.0);
 }
 
 function initScene() {
@@ -164,26 +168,132 @@ function initCamera() {
 	cameraBox = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({
 		color: 0x00ff00,
 		transparent: true,
-		opacity: 0
+		opacity: 0.5
 	}));
 
 	//设置摄像机香肠的位置，为第一个模型的位置
 	cameraBox.position.set(0, 0, 0);
 	scene.add(cameraBox);
+
+	//创建摄像机
+	camera = new THREE.PerspectiveCamera(45, wid / hei, 1, 20000);
+	camera.position.set(0, 0, 50);
+	/*camera.position.x = modelArr[0].x - 100;
+	camera.position.y = modelArr[0].y + 150;
+	camera.position.z = modelArr[0].z + camera_dis;*/
+
+	setCamera();
+}
+
+function setCamera() {
 	cameraBox.position.x = modelArr[0].x;
 	cameraBox.position.y = modelArr[0].y;
 	cameraBox.position.z = modelArr[0].z;
 
-	//创建摄像机
-	camera = new THREE.PerspectiveCamera(45, wid / hei, 1, 20000);
-	camera.position.set(0, 5, camera_dis);
 	camera.position.x = modelArr[0].x - 100;
 	camera.position.y = modelArr[0].y + 150;
 	camera.position.z = modelArr[0].z + camera_dis;
-
 	//让摄像机看向香肠
 	camera.lookAt(cameraBox.position);
+}
 
+var manifest;
+var preload;
+var loadingBox;
+var loadingBg;
+var loadingTxt;
+
+//创建loading界页
+function create_loading() {
+	$('#wrapper').show();
+	//$('#wrapper').addClass('wrapper_show');
+
+	loadingBox = new THREE.Object3D();
+	scene.add(loadingBox);
+
+	//创建文字
+	var loader = new THREE.FontLoader();
+	loader.load('fonts/helvetiker_regular.typeface.json', function(font) {
+		txt_material = new THREE.MeshBasicMaterial({
+			color: 0xffffff,
+			transparent: true
+		});
+		txt_material.needsUpdate = true; //设置材质可以更新，方便后面的渐隐动画
+
+		var options = {
+			font: font,
+			size: 2,
+			height: 1
+		};
+
+		loadingTxt = new THREE.Mesh(new THREE.TextGeometry('LOADING . . .', options), txt_material);
+		loadingBox.add(loadingTxt);
+		loadingTxt.position.x = -7;
+		loadingTxt.position.z = -30;
+	});
+
+	//创建loading黑底
+	var bg_material = new THREE.MeshBasicMaterial({
+		color: 0x000000,
+		transparent: true
+	});
+	bg_material.needsUpdate = true;
+
+	var bg_geo = new THREE.PlaneGeometry(200, 100);
+	loadingBg = new THREE.Mesh(bg_geo, bg_material);
+	loadingBox.add(loadingBg);
+	loadingBg.position.z = -31;
+
+	loadingBox.lookAt(camera.position);
+	loadingBox.position.x = camera.position.x + 33;
+	loadingBox.position.y = camera.position.y - 50;
+	loadingBox.position.z = camera.position.z - 14;
+
+	manifest = [
+		"background.jpg",
+		"color.jpg",
+		"particle1.jpg",
+		"person.json",
+		"mascot.tjs.sea",
+		"land/a/textures/textureSurface_Color_2.jpg",
+		"land/a1/textures/texture.png",
+		"land/b/textures/sketchfabSurface_Color.jpg",
+		"land/a1/animations.json",
+		"land/a/aland.json",
+		"cloud/cloud.json",
+		"land/b/bLand.json"
+	];
+
+	preload = new createjs.LoadQueue(true, "model/");
+	preload.on("complete", handleComplete, this);
+	preload.loadManifest(manifest);
+}
+
+function handleComplete() {
+	initControl(); //初始化控制器
+	create_sky(); //创建天空
+	create_model(); //创建模型
+	join_clouds(); //创建所有的云
+	create_ball(); //创建点击提示球
+	create_particle(); //创建粒子
+}
+
+//loading界面消失
+function loadingOut() {
+	//取消电磁干扰shader
+	effectCopy.renderToScreen = true;
+	effectGlitch.renderToScreen = false;
+	
+	TweenMax.to(loadingTxt.material, 0.5, {
+		opacity: 0
+	});
+
+	TweenMax.to(loadingBg.material, 0.5, {
+		opacity: 0,
+		onComplete:function(){
+			beginGame();
+		}
+	});
 }
 
 //初始化控制器，这个控制器是点击模型后控制摄像机转的，围着该模型转
@@ -292,13 +402,17 @@ function create_model() {
 		if(__num >= modelArr.length) {
 			//模型都载入完毕后，可以开始移动摄像机了
 			setTimeout(function() {
-				isBegin = true;
-				isMove = false;
-				$('#wrapper').show();
-				$('#wrapper').addClass('wrapper_show');
+				loadingOut(); //loading界面消失
 			}, 500);
 		}
 	}
+}
+
+//开始运动
+function beginGame() {
+	isBegin = true;
+	isMove = false;
+	initAction();
 }
 
 //创建模型
@@ -563,14 +677,19 @@ function initShader() {
 	vTilt.uniforms.r.value = 0.5;
 
 	var renderPass = new THREE.RenderPass(scene, camera);
-	var effectCopy = new THREE.ShaderPass(THREE.CopyShader);
-	effectCopy.renderToScreen = true;
+	effectCopy = new THREE.ShaderPass(THREE.CopyShader);
+	//effectCopy.renderToScreen = true;
+
+	//电磁干扰shader
+	effectGlitch = new THREE.GlitchPass(64);
+	effectGlitch.renderToScreen = true;
 
 	composer = new THREE.EffectComposer(renderer);
 	composer.addPass(renderPass);
 	composer.addPass(vTilt);
 	composer.addPass(hTilt);
 	composer.addPass(effectCopy);
+	composer.addPass(effectGlitch);
 
 	render();
 }
